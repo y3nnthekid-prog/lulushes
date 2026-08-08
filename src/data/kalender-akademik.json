@@ -4,56 +4,58 @@
     "keputusan": "Keputusan Rektor Nomor 28 Tahun 2026",
     "ditetapkan": "22 Januari 2026",
     "tahunAkademik": "2026/2027",
-    "berkas": "/template/kalender-akademik-uin-jakarta-2026-2027.pdf"
+    "berkas": "/template/kalender-akademik-uin-jakarta-2026-2027.pdf",
+    "mulai": "2026-07-20",
+    "selesai": "2027-08-29"
   },
   "wisuda": [
     {
       "ke": 142,
-      "pendaftaran": "1 September – 19 Oktober 2026",
-      "penyerahanPeserta": "9 November 2026",
-      "gladiResik": "26 November 2026",
-      "pelaksanaan": "28–29 November 2026"
+      "pendaftaran": { "mulai": "2026-09-01", "selesai": "2026-10-19" },
+      "penyerahanPeserta": "2026-11-09",
+      "gladiResik": "2026-11-26",
+      "pelaksanaan": { "mulai": "2026-11-28", "selesai": "2026-11-29" }
     },
     {
       "ke": 143,
-      "pendaftaran": "1 Desember 2026 – 15 Januari 2027",
-      "penyerahanPeserta": "8 Februari 2027",
-      "gladiResik": "25 Februari 2027",
-      "pelaksanaan": "27–28 Februari 2027"
+      "pendaftaran": { "mulai": "2026-12-01", "selesai": "2027-01-15" },
+      "penyerahanPeserta": "2027-02-08",
+      "gladiResik": "2027-02-25",
+      "pelaksanaan": { "mulai": "2027-02-27", "selesai": "2027-02-28" }
     },
     {
       "ke": 144,
-      "pendaftaran": "1 Maret – 16 April 2027",
-      "penyerahanPeserta": "10 Mei 2027",
-      "gladiResik": "27 Mei 2027",
-      "pelaksanaan": "29–30 Mei 2027"
+      "pendaftaran": { "mulai": "2027-03-01", "selesai": "2027-04-16" },
+      "penyerahanPeserta": "2027-05-10",
+      "gladiResik": "2027-05-27",
+      "pelaksanaan": { "mulai": "2027-05-29", "selesai": "2027-05-30" }
     },
     {
       "ke": 145,
-      "pendaftaran": "2 Juni – 16 Juli 2027",
-      "penyerahanPeserta": "9 Agustus 2027",
-      "gladiResik": "26 Agustus 2027",
-      "pelaksanaan": "28–29 Agustus 2027"
+      "pendaftaran": { "mulai": "2027-06-02", "selesai": "2027-07-16" },
+      "penyerahanPeserta": "2027-08-09",
+      "gladiResik": "2027-08-26",
+      "pelaksanaan": { "mulai": "2027-08-28", "selesai": "2027-08-29" }
     }
   ],
   "semester": [
     {
       "nama": "Ganjil 2026/2027",
-      "perkuliahan": "1 September 2026 – 8 Januari 2027",
-      "pembayaranUkt": "20 Juli – 19 Agustus 2026",
-      "pengajuanCuti": "20 Juli – 19 Agustus 2026",
-      "pengisianErs": "20 Juli – 20 Agustus 2026",
-      "validasiErs": "20 Juli – 21 Agustus 2026",
-      "pengisianNilai": "28 Desember 2026 – 15 Januari 2027"
+      "perkuliahan": { "mulai": "2026-09-01", "selesai": "2027-01-08" },
+      "pembayaranUkt": { "mulai": "2026-07-20", "selesai": "2026-08-19" },
+      "pengajuanCuti": { "mulai": "2026-07-20", "selesai": "2026-08-19" },
+      "pengisianErs": { "mulai": "2026-07-20", "selesai": "2026-08-20" },
+      "validasiErs": { "mulai": "2026-07-20", "selesai": "2026-08-21" },
+      "pengisianNilai": { "mulai": "2026-12-28", "selesai": "2027-01-15" }
     },
     {
       "nama": "Genap 2026/2027",
-      "perkuliahan": "1 Maret – 27 Juli 2027",
-      "pembayaranUkt": "18 Januari – 19 Februari 2027",
-      "pengajuanCuti": "18 Januari – 19 Februari 2027",
-      "pengisianErs": "18 Januari – 21 Februari 2027",
-      "validasiErs": "18 Januari – 22 Februari 2027",
-      "pengisianNilai": "11 Juli – 30 Juli 2027"
+      "perkuliahan": { "mulai": "2027-03-01", "selesai": "2027-07-27" },
+      "pembayaranUkt": { "mulai": "2027-01-18", "selesai": "2027-02-19" },
+      "pengajuanCuti": { "mulai": "2027-01-18", "selesai": "2027-02-19" },
+      "pengisianErs": { "mulai": "2027-01-18", "selesai": "2027-02-21" },
+      "validasiErs": { "mulai": "2027-01-18", "selesai": "2027-02-22" },
+      "pengisianNilai": { "mulai": "2027-07-11", "selesai": "2027-07-30" }
     }
   ]
 }

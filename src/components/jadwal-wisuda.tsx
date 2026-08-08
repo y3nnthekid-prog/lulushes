@@ -1,6 +1,7 @@
 import { CalendarDays, FileDown } from "lucide-react";
 
 import { kalender } from "@/lib/data";
+import { formatRentang, formatTanggal } from "@/lib/tanggal";
 
 /**
  * Jadwal wisuda dari kalender akademik universitas.
@@ -49,15 +50,18 @@ export function JadwalWisuda() {
                 Wisuda ke-{w.ke}
               </h3>
               <p className="font-heading text-sm font-semibold text-brand tabular-nums">
-                {w.pelaksanaan}
+                {formatRentang(w.pelaksanaan)}
               </p>
             </div>
 
             <dl className="mt-3 grid gap-x-4 gap-y-2 text-sm sm:grid-cols-2">
               {[
-                { k: "Pendaftaran online di AIS", v: w.pendaftaran },
-                { k: "Penyerahan peserta", v: w.penyerahanPeserta },
-                { k: "Gladi resik", v: w.gladiResik },
+                {
+                  k: "Pendaftaran online di AIS",
+                  v: formatRentang(w.pendaftaran),
+                },
+                { k: "Penyerahan peserta", v: formatTanggal(w.penyerahanPeserta) },
+                { k: "Gladi resik", v: formatTanggal(w.gladiResik) },
               ].map(({ k, v }) => (
                 <div key={k}>
                   <dt className="text-xs text-muted-foreground">{k}</dt>

@@ -3,6 +3,7 @@ import { join } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
+import { agenda } from "@/lib/agenda";
 import { downloads, kalender } from "@/lib/data";
 
 /**
@@ -44,12 +45,50 @@ describe("kalender akademik", () => {
     expect(new Set(nomor).size).toBe(nomor.length);
   });
 
-  it("setiap gelombang mengisi semua tanggalnya", () => {
+  it("setiap tanggal ditulis ISO dan rentangnya tidak terbalik", () => {
+    const iso = /^\d{4}-\d{2}-\d{2}$/;
+    const periksa = (v: unknown, jalur: string) => {
+      if (typeof v === "string") {
+        expect(v, jalur).toMatch(iso);
+        return;
+      }
+      if (v && typeof v === "object" && "mulai" in v && "selesai" in v) {
+        const r = v as { mulai: string; selesai: string };
+        expect(r.mulai, `${jalur}.mulai`).toMatch(iso);
+        expect(r.selesai, `${jalur}.selesai`).toMatch(iso);
+        // Rentang terbalik akan menggambar batang berlebar negatif di
+        // kalender — tidak terlihat, dan tidak ada yang memberi tahu.
+        expect(
+          r.selesai >= r.mulai,
+          `${jalur}: selesai (${r.selesai}) mendahului mulai (${r.mulai})`,
+        ).toBe(true);
+      }
+    };
+
     for (const w of kalender.wisuda) {
       for (const [k, v] of Object.entries(w)) {
-        expect(String(v).trim(), `wisuda ke-${w.ke} · ${k}`).not.toBe("");
-        expect(String(v), `wisuda ke-${w.ke} · ${k}`).not.toMatch(/^—$/);
+        if (k === "ke") continue;
+        periksa(v, `wisuda ke-${w.ke} · ${k}`);
       }
+    }
+    for (const s of kalender.semester) {
+      for (const [k, v] of Object.entries(s)) {
+        if (k === "nama") continue;
+        periksa(v, `${s.nama} · ${k}`);
+      }
+    }
+  });
+
+  it("sumbu waktunya memuat seluruh agenda", () => {
+    const { mulai, selesai } = kalender.sumber;
+    for (const a of agenda) {
+      expect(a.rentang.mulai >= mulai, `${a.label} mulai sebelum sumbu`).toBe(
+        true,
+      );
+      expect(
+        a.rentang.selesai <= selesai,
+        `${a.label} selesai sesudah sumbu`,
+      ).toBe(true);
     }
   });
 

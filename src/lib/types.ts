@@ -127,24 +127,38 @@ export type ScheduleConfig = {
   reminders: string[];
 };
 
+/**
+ * Rentang tanggal kalender, ditulis ISO (YYYY-MM-DD).
+ *
+ * Sengaja ISO, bukan kalimat siap-tampil seperti "1 September – 19 Oktober
+ * 2026". Kalender di beranda perlu membandingkan tanggal dengan hari ini
+ * untuk menandai apa yang sedang berlangsung, dan kalimat tidak bisa
+ * dibandingkan. Teks tampilannya dibangkitkan dari sini oleh `formatRentang`,
+ * jadi yang terbaca dan yang terhitung tidak mungkin berbeda.
+ */
+export type Rentang = {
+  mulai: string;
+  selesai: string;
+};
+
 /** Satu gelombang wisuda beserta jendela pendaftarannya. */
 export type Wisuda = {
   ke: number;
-  pendaftaran: string;
+  pendaftaran: Rentang;
   penyerahanPeserta: string;
   gladiResik: string;
-  pelaksanaan: string;
+  pelaksanaan: Rentang;
 };
 
 /** Tanggal administratif satu semester yang menyangkut mahasiswa tingkat akhir. */
 export type SemesterAkademik = {
   nama: string;
-  perkuliahan: string;
-  pembayaranUkt: string;
-  pengajuanCuti: string;
-  pengisianErs: string;
-  validasiErs: string;
-  pengisianNilai: string;
+  perkuliahan: Rentang;
+  pembayaranUkt: Rentang;
+  pengajuanCuti: Rentang;
+  pengisianErs: Rentang;
+  validasiErs: Rentang;
+  pengisianNilai: Rentang;
 };
 
 /**
@@ -163,6 +177,9 @@ export type KalenderAkademik = {
     ditetapkan: string;
     tahunAkademik: string;
     berkas: string;
+    /** Sumbu waktu kalender: dari agenda paling awal sampai paling akhir. */
+    mulai: string;
+    selesai: string;
   };
   wisuda: Wisuda[];
   semester: SemesterAkademik[];

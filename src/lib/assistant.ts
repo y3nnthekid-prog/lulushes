@@ -8,6 +8,7 @@ import {
   stages,
   totalStages,
 } from "@/lib/data";
+import { formatRentang, formatTanggal } from "@/lib/tanggal";
 import type { SourceLevel } from "@/lib/types";
 
 /**
@@ -723,7 +724,7 @@ export const knowledge: Answer[] = [
        * konteks kampus — AIS dan gladi resik.
        */
       titleExtra: "AIS gladi resik gelombang",
-      body: `Pelaksanaan: ${w.pelaksanaan}\nPendaftaran online di AIS: ${w.pendaftaran}\nPenyerahan peserta dan skripsi terbaik: ${w.penyerahanPeserta}\nGladi resik: ${w.gladiResik}\n\nSumber: ${kalender.sumber.keputusan}, ditetapkan ${kalender.sumber.ditetapkan}, tahun akademik ${kalender.sumber.tahunAkademik}.`,
+      body: `Pelaksanaan: ${formatRentang(w.pelaksanaan)}\nPendaftaran online di AIS: ${formatRentang(w.pendaftaran)}\nPenyerahan peserta dan skripsi terbaik: ${formatTanggal(w.penyerahanPeserta)}\nGladi resik: ${formatTanggal(w.gladiResik)}\n\nSumber: ${kalender.sumber.keputusan}, ditetapkan ${kalender.sumber.ditetapkan}, tahun akademik ${kalender.sumber.tahunAkademik}.`,
       href: "/tahapan/wisuda",
       hrefLabel: "Buka tahap wisuda",
       haystack: `wisuda ke-${w.ke} ke ${w.ke} gelombang jadwal kapan tanggal pendaftaran ais gladi resik toga upacara kalender akademik`,
@@ -751,10 +752,10 @@ export const knowledge: Answer[] = [
     body: `${kalender.sumber.keputusan}, ditetapkan ${kalender.sumber.ditetapkan}.\n\n${kalender.semester
       .map(
         (s) =>
-          `${s.nama}\n• Perkuliahan: ${s.perkuliahan}\n• Pembayaran UKT: ${s.pembayaranUkt}\n• Pengajuan cuti kuliah: ${s.pengajuanCuti}\n• Pengisian e-RS: ${s.pengisianErs}\n• Pengisian nilai oleh dosen: ${s.pengisianNilai}`,
+          `${s.nama}\n• Perkuliahan: ${formatRentang(s.perkuliahan)}\n• Pembayaran UKT: ${formatRentang(s.pembayaranUkt)}\n• Pengajuan cuti kuliah: ${formatRentang(s.pengajuanCuti)}\n• Pengisian e-RS: ${formatRentang(s.pengisianErs)}\n• Pengisian nilai oleh dosen: ${formatRentang(s.pengisianNilai)}`,
       )
       .join("\n\n")}\n\nWisuda tahun akademik ini: ${kalender.wisuda
-      .map((w) => `ke-${w.ke} (${w.pelaksanaan})`)
+      .map((w) => `ke-${w.ke} (${formatRentang(w.pelaksanaan)})`)
       .join(", ")}.`,
     href: "/download#kalender-akademik",
     hrefLabel: "Unduh kalender akademik",

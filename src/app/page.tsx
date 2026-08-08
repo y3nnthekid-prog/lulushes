@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import { Hero } from "@/components/hero";
+import { KalenderAkademik } from "@/components/kalender-akademik";
 import { LinkButton } from "@/components/link-button";
 import { PositionCard } from "@/components/position-card";
 import { Reveal } from "@/components/reveal";
@@ -274,6 +275,15 @@ export default function HomePage() {
             <p className="mt-4 rounded-xl border border-warn/30 bg-warn-muted p-3 text-xs text-foreground/80">
               {schedule.warning}
             </p>
+          </Reveal>
+        </section>
+
+        {/* Kalender akademik universitas. Ditaruh sesudah siklus ujian bulanan
+            Prodi karena keduanya bicara waktu, tapi beda tingkat: yang di atas
+            mengatur ujian, yang ini mengatur wisuda dan administrasi. */}
+        <section className="border-t py-12">
+          <Reveal>
+            <KalenderAkademik />
           </Reveal>
         </section>
 
