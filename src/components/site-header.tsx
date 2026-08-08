@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  CalendarDays,
   Compass,
   FolderDown,
   HelpCircle,
@@ -42,6 +43,7 @@ const ikonHalaman: Record<string, LucideIcon> = {
   "/": Compass,
   "/roadmap": Map,
   "/tahapan": ListChecks,
+  "/kalender": CalendarDays,
   "/download": FolderDown,
   "/main": Sparkles,
   "/faq": HelpCircle,

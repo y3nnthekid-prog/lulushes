@@ -21,6 +21,7 @@ export const halaman: Halaman[] = [
   { href: "/", label: "Home", prioritas: 1 },
   { href: "/roadmap", label: "Roadmap", prioritas: 0.9 },
   { href: "/tahapan", label: "Tahapan", prioritas: 0.9 },
+  { href: "/kalender", label: "Kalender", prioritas: 0.8 },
   { href: "/download", label: "Download", prioritas: 0.8 },
   { href: "/main", label: "Main", prioritas: 0.5 },
   { href: "/faq", label: "FAQ", prioritas: 0.7 },

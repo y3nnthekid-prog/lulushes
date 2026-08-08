@@ -1,39 +1,12 @@
 "use client";
 
-import * as React from "react";
-import { CalendarRange, Dot, FileDown } from "lucide-react";
+import { Dot, FileDown } from "lucide-react";
 
 import { berikutnya, yangBerlangsung } from "@/lib/agenda";
+import { useHariIni } from "@/components/gunakan-hari-ini";
 import { KalenderBulanan } from "@/components/kalender-bulanan";
 import { kalender } from "@/lib/data";
-import { formatTanggal, selisihHari, uraiTanggal } from "@/lib/tanggal";
-
-/** Tanggal tidak berubah selama satu kunjungan; tidak ada yang perlu dilanggan. */
-const langganan = () => () => {};
-
-function isoLokal(d: Date) {
-  const b = String(d.getMonth() + 1).padStart(2, "0");
-  const h = String(d.getDate()).padStart(2, "0");
-  return `${d.getFullYear()}-${b}-${h}`;
-}
-
-/**
- * Tanggal hari ini, `null` sampai komponennya hidup di peramban.
- *
- * Server tidak ikut menghitungnya. Kalau ikut, keadaan "sedang berlangsung"
- * dirender memakai jam server lalu dikoreksi di peramban — dan React
- * menganggapnya ketidakcocokan hidrasi. Selain itu beranda ini dirender
- * statis saat build; tanggal yang ikut terpanggang akan basi begitu
- * halamannya dilayani besok.
- */
-function useHariIni(): Date | null {
-  const iso = React.useSyncExternalStore(
-    langganan,
-    () => isoLokal(new Date()),
-    () => null,
-  );
-  return iso ? uraiTanggal(iso) : null;
-}
+import { formatTanggal, selisihHari } from "@/lib/tanggal";
 
 export function KalenderAkademik() {
   const hariIni = useHariIni();
@@ -42,21 +15,15 @@ export function KalenderAkademik() {
   const nanti = hariIni ? berikutnya(hariIni) : null;
 
   return (
+    /*
+     * Tanpa judul sendiri.
+     *
+     * Komponen ini kini hanya dipakai di /kalender, yang h1-nya sudah berbunyi
+     * "Kalender akademik 2026/2027" dan paragraf pembukanya sudah menyebut
+     * Keputusan Rektornya. Judul kartu yang mengulang keduanya membuat nomor
+     * keputusan yang sama tampil tiga kali dalam satu layar.
+     */
     <div className="rounded-3xl border bg-card p-5 sm:p-6">
-      <div className="flex items-center gap-2.5">
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand">
-          <CalendarRange className="size-4.5" aria-hidden />
-        </span>
-        <div className="min-w-0">
-          <h2 className="font-heading text-lg font-semibold">
-            Kalender akademik {kalender.sumber.tahunAkademik}
-          </h2>
-          <p className="text-xs text-muted-foreground">
-            {kalender.sumber.keputusan}
-          </p>
-        </div>
-      </div>
-
       {/*
        * Ringkasan hari ini, ditaruh sebelum kalendernya.
        *

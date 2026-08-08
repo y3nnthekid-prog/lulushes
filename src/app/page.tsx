@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 
 import { Hero } from "@/components/hero";
-import { KalenderAkademik } from "@/components/kalender-akademik";
+import { KalenderRingkas } from "@/components/kalender-ringkas";
 import { LinkButton } from "@/components/link-button";
 import { PositionCard } from "@/components/position-card";
 import { Reveal } from "@/components/reveal";
@@ -278,12 +278,14 @@ export default function HomePage() {
           </Reveal>
         </section>
 
-        {/* Kalender akademik universitas. Ditaruh sesudah siklus ujian bulanan
-            Prodi karena keduanya bicara waktu, tapi beda tingkat: yang di atas
-            mengatur ujian, yang ini mengatur wisuda dan administrasi. */}
+        {/* Kalender akademik: di sini cuma ringkasannya.
+            Kalender penuhnya setinggi 1.238 piksel — hampir dua layar ponsel
+            untuk satu seksi beranda — jadi ia pindah ke /kalender. Yang
+            tertinggal menjawab satu pertanyaan saja: ada yang harus kukerjakan
+            hari ini? */}
         <section className="border-t py-12">
           <Reveal>
-            <KalenderAkademik />
+            <KalenderRingkas />
           </Reveal>
         </section>
 

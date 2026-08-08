@@ -4,6 +4,7 @@ import * as React from "react";
 import { CalendarDays, ChevronLeft, ChevronRight, Info, Moon } from "lucide-react";
 
 import { agenda } from "@/lib/agenda";
+import { isoLokal, useHariIni } from "@/components/gunakan-hari-ini";
 import { formatRentang, sedangBerlangsung, uraiTanggal } from "@/lib/tanggal";
 import {
   formatHijriah,
@@ -31,20 +32,6 @@ const WARNA_PUASA: Record<JenisPuasa, string> = {
   "ayyamul-bidh": "bg-brand/70",
   "senin-kamis": "bg-brand/35",
 };
-
-const langganan = () => () => {};
-const isoLokal = (d: Date) =>
-  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-
-/** Tanggal hari ini; `null` sampai hidup di peramban. Lihat kalender-akademik.tsx. */
-function useHariIni(): Date | null {
-  const iso = React.useSyncExternalStore(
-    langganan,
-    () => isoLokal(new Date()),
-    () => null,
-  );
-  return iso ? uraiTanggal(iso) : null;
-}
 
 /** Sel satu bulan, disusun mulai Senin dan digenapkan jadi enam baris. */
 function selBulan(tahun: number, bulan: number): Date[] {
@@ -109,9 +96,12 @@ export function KalenderBulanan() {
             <CalendarDays className="size-4.5" aria-hidden />
           </span>
           <div>
-            <h3 className="font-heading text-lg font-semibold">
+            {/* h2, bukan h3: kartu induknya sudah tidak punya judul sendiri,
+                jadi ini judul seksi pertama di bawah h1 halaman. Melompat ke
+                h3 membuat urutan judulnya bolong bagi pembaca layar. */}
+            <h2 className="font-heading text-lg font-semibold">
               {BULAN_MASEHI[bulan]} {tahun}
-            </h3>
+            </h2>
             <p className="text-xs text-muted-foreground">
               {hAwal.bulan === hAkhir.bulan
                 ? formatHijriah(hAwal)
