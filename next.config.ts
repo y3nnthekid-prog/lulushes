@@ -24,6 +24,9 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Sembunyikan header "X-Powered-By: Next.js" — bocoran kecil soal framework
+  // yang dipakai penyerang untuk menyaring target.
+  poweredByHeader: false,
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
