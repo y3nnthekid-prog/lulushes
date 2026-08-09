@@ -1,0 +1,34 @@
+# Dependabot: pemutakhiran dependensi otomatis, tanpa perlu diminta.
+#
+# Setiap minggu Dependabot memeriksa paket npm dan action GitHub, lalu membuka
+# PR bila ada versi baru — terutama tambalan keamanan. PR itu otomatis diuji
+# oleh workflow "Keamanan" (npm audit, CodeQL, dependency-review), jadi kamu
+# tinggal meninjau lalu klik merge. Perbaikan kerentanan mendesak dibuka
+# segera oleh "automated security fixes" GitHub, tak menunggu jadwal mingguan.
+version: 2
+updates:
+  # Paket aplikasi (npm)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    # Kelompokkan agar tidak membanjiri dengan banyak PR kecil.
+    groups:
+      dependensi-produksi:
+        dependency-type: "production"
+      dependensi-pengembangan:
+        dependency-type: "development"
+
+  # Versi action di dalam workflow .github/workflows/*
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "github-actions"
