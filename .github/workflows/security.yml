@@ -1,0 +1,78 @@
+# Pemindaian keamanan otomatis.
+#
+# Berjalan saat: push ke main, setiap pull request, terjadwal tiap Senin,
+# dan bisa dipicu manual dari tab Actions.
+#
+# Empat lapis, semuanya memakai action resmi/tepercaya:
+#   1. audit             — kerentanan pada dependensi npm.
+#   2. codeql            — analisis statis kode (SAST) untuk JS/TS.
+#   3. secrets           — mendeteksi kunci/token yang tidak sengaja ter-commit.
+#   4. dependency-review — memblokir dependensi rentan yang masuk lewat PR.
+#
+# Catatan: CodeQL & dependency-review gratis untuk repositori PUBLIK. Bila repo
+# ini privat tanpa GitHub Advanced Security, kedua job itu bisa dilewati/dihapus.
+name: Keamanan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 2 * * 1" # setiap Senin 02:00 UTC
+  workflow_dispatch:
+
+# Izin minimum secara default; job yang butuh lebih menaikkannya sendiri.
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Audit dependensi (npm)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # Gagalkan build bila ada kerentanan level high/critical di dependensi produksi.
+      - name: npm audit
+        run: npm audit --omit=dev --audit-level=high
+
+  codeql:
+    name: CodeQL (SAST)
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          queries: security-and-quality
+      - uses: github/codeql-action/analyze@v3
+
+  secrets:
+    name: Pemindaian secret (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # perlu seluruh riwayat untuk memindai commit lama
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  dependency-review:
+    name: Tinjauan dependensi (PR)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
