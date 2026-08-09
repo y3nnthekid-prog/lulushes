@@ -13,6 +13,8 @@
  * sesungguhnya adalah spend limit di Console Anthropic.
  */
 
+import { batasiLaju } from "@/lib/redis";
+
 const MINUTE = 60_000;
 
 /* ---------------------------------------------------------------- */
@@ -60,6 +62,20 @@ export function checkRate(ip: string): RateVerdict {
     retryAfter: 0,
     remaining: MAX_REQUESTS_PER_WINDOW - recent.length,
   };
+}
+
+/**
+ * Rate limit yang lebih kuat: coba Redis (dibagi lintas instance) dulu, dan
+ * hanya jatuh ke penjaga in-memory bila Redis belum terpasang atau tidak
+ * menjawab. Inilah yang dipakai endpoint mahal (asisten AI).
+ */
+export async function checkRateGlobal(ip: string): Promise<RateVerdict> {
+  const global = await batasiLaju(ip, {
+    batas: MAX_REQUESTS_PER_WINDOW,
+    jendelaMs: WINDOW_MS,
+    prefiks: "laju:tanya",
+  });
+  return global ?? checkRate(ip);
 }
 
 /* ---------------------------------------------------------------- */

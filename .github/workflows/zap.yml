@@ -1,0 +1,34 @@
+# Pemindaian DAST (situs yang sudah berjalan) dengan OWASP ZAP Baseline.
+#
+# "Baseline" = pasif: ZAP menelusuri situs dan mengamati respons, TANPA
+# serangan aktif — jadi aman dijalankan terhadap situs produksi.
+#
+# Sengaja TIDAK berjalan tiap push (itu memukul situs live tanpa perlu).
+# Hanya terjadwal mingguan dan bisa dipicu manual dari tab Actions.
+#
+# Temuan diringkas menjadi satu GitHub Issue (diperbarui, bukan menumpuk).
+name: DAST (OWASP ZAP)
+
+on:
+  schedule:
+    - cron: "0 3 * * 1" # setiap Senin 03:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write # ZAP menulis ringkasan temuan sebagai issue
+
+jobs:
+  zap-baseline:
+    name: ZAP Baseline (situs live)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: ZAP Baseline Scan
+        uses: zaproxy/action-baseline@v0.15.0
+        with:
+          target: "https://lulushes.my.id/"
+          # Peringatan tidak menggagalkan workflow — ini alat pemantau, bukan gerbang rilis.
+          fail_action: false
+          # -I: jangan keluar dengan kode galat hanya karena ada peringatan.
+          cmd_options: "-I"

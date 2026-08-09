@@ -7,7 +7,7 @@ import {
   cacheKey,
   cacheSet,
   callerIp,
-  checkRate,
+  checkRateGlobal,
   claimBudget,
   refundBudget,
 } from "@/lib/ai/guard";
@@ -83,8 +83,8 @@ export async function POST(request: Request) {
     );
   }
 
-  // 2. Rate limit — menahan satu sumber yang menghantam endpoint
-  const rate = checkRate(callerIp(request));
+  // 2. Rate limit — terdistribusi lewat Redis (cadangan: in-memory)
+  const rate = await checkRateGlobal(callerIp(request));
   if (!rate.allowed) {
     return json(
       { error: "Terlalu banyak pertanyaan dalam waktu singkat. Coba lagi sebentar lagi." },

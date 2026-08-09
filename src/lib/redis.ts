@@ -80,6 +80,51 @@ async function perintah(args: (string | number)[]): Promise<unknown | null> {
   }
 }
 
+export type HasilLaju = {
+  allowed: boolean;
+  /** Detik yang harus ditunggu sebelum boleh mencoba lagi. */
+  retryAfter: number;
+  remaining: number;
+};
+
+/**
+ * Rate limit terdistribusi dengan jendela tetap.
+ *
+ * Berbeda dengan penjaga in-memory, hitungan ini dibagi lintas SEMUA instance
+ * serverless — jadi "20 per jendela" benar-benar 20, bukan 20 per instance yang
+ * mudah ditembus dengan menyebar permintaan. Nomor jendela ikut di dalam kunci,
+ * jadi kunci berganti sendiri tiap periode; PEXPIRE hanya membersihkan sisa.
+ *
+ * Mengembalikan null bila Redis tidak terpasang atau tidak menjawab, supaya
+ * pemanggil bisa jatuh kembali ke penjaga in-memory.
+ */
+export async function batasiLaju(
+  ip: string,
+  opsi: { batas: number; jendelaMs: number; prefiks: string },
+): Promise<HasilLaju | null> {
+  if (!kredensial()) return null;
+
+  const jendela = Math.floor(Date.now() / opsi.jendelaMs);
+  const kunci = `${opsi.prefiks}:${ip}:${jendela}`;
+
+  const jumlah = await perintah(["INCR", kunci]);
+  if (typeof jumlah !== "number") return null; // Redis gagal -> pakai cadangan
+
+  // Baru pertama di jendela ini: pasang kedaluwarsa agar kunci tak menumpuk.
+  if (jumlah === 1) await perintah(["PEXPIRE", kunci, opsi.jendelaMs]);
+
+  if (jumlah > opsi.batas) {
+    const sisaMs = await perintah(["PTTL", kunci]);
+    const retryAfter =
+      typeof sisaMs === "number" && sisaMs > 0
+        ? Math.ceil(sisaMs / 1000)
+        : Math.ceil(opsi.jendelaMs / 1000);
+    return { allowed: false, retryAfter, remaining: 0 };
+  }
+
+  return { allowed: true, retryAfter: 0, remaining: opsi.batas - jumlah };
+}
+
 export type SkorGlobal = { nama: string; skor: number };
 
 /**

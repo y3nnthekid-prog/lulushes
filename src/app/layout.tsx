@@ -1,6 +1,7 @@
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { headers } from "next/headers";
 
 import { Assistant } from "@/components/assistant";
 import { CursorLucu } from "@/components/cursor-lucu";
@@ -54,11 +55,15 @@ export const metadata: Metadata = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Nonce dipasang oleh src/proxy.ts. Skrip inline di bawah harus membawanya,
+  // kalau tidak akan diblokir CSP.
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
+
   return (
     <html
       lang="id"
@@ -73,13 +78,14 @@ export default function RootLayout({
           <head> supaya tidak ada kedipan sebelum gaya sempat berlaku.
         */}
         <script
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `document.documentElement.classList.add('js-reveal')`,
           }}
         />
       </head>
       <body className="flex min-h-full flex-col">
-        <Providers>
+        <Providers nonce={nonce}>
           <a
             href="#konten"
             className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-background focus:px-3 focus:py-2 focus:ring-2 focus:ring-ring"
