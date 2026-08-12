@@ -1,13 +1,28 @@
 import type { NextConfig } from "next";
 
+import { susunCsp } from "./src/lib/csp";
+
 /**
  * Header keamanan statis untuk setiap permintaan.
  *
- * Content-Security-Policy TIDAK di sini — ia butuh nonce acak per-permintaan,
- * jadi disusun di `src/proxy.ts`. Header di bawah ini bernilai tetap sehingga
- * cocok dipasang di tingkat konfigurasi.
+ * Versi ber-nonce dari CSP disusun di `src/proxy.ts`, dan ia menimpa yang di
+ * sini pada permintaan biasa. Yang di sini adalah LANTAI: ia berlaku juga pada
+ * respons yang tidak dilewati proxy — terutama permintaan ber-header
+ * `Purpose: prefetch`, yang sebelumnya keluar tanpa CSP sama sekali.
+ *
+ * Bedanya hanya `script-src`: di sini `'unsafe-inline'`, karena respons yang
+ * melewati proxy tidak punya nonce untuk dirujuk. Seluruh direktif lain sama
+ * persis, termasuk yang paling bernilai — `object-src 'none'`,
+ * `frame-ancestors 'none'`, dan `connect-src` yang membatasi eksfiltrasi.
  */
 const securityHeaders = [
+  {
+    key: "Content-Security-Policy",
+    value: susunCsp({
+      skripInline: "'unsafe-inline'",
+      dev: process.env.NODE_ENV === "development",
+    }),
+  },
   {
     // Paksa HTTPS selama dua tahun, termasuk subdomain. 'preload' adalah
     // komitmen: sekali masuk daftar preload browser, sulit dibatalkan.

@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { susunCsp } from "@/lib/csp";
+
 /**
  * Content-Security-Policy berbasis nonce.
  *
@@ -15,33 +17,16 @@ import { NextResponse, type NextRequest } from "next/server";
  *
  * Catatan: nonce menuntut render dinamis per-permintaan, jadi halaman tidak
  * lagi murni statis. Untuk situs sekecil ini biayanya kecil dan sepadan.
+ *
+ * Direktifnya ada di `@/lib/csp`, dipakai bersama dengan versi dasar di
+ * `next.config.ts`. Permintaan prefetch melewati proxy ini, dan versi dasar
+ * itulah yang menjaganya supaya tidak keluar tanpa CSP sama sekali.
  */
 export function proxy(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const isDev = process.env.NODE_ENV === "development";
 
-  const csp = [
-    "default-src 'self'",
-    "base-uri 'self'",
-    "object-src 'none'",
-    "frame-ancestors 'none'",
-    "form-action 'self'",
-    "img-src 'self' data: https:",
-    "font-src 'self' data:",
-    // Gaya inline dari komponen animasi (motion, progress ring) tetap diizinkan;
-    // risiko XSS lewat style jauh lebih kecil daripada lewat script.
-    "style-src 'self' 'unsafe-inline'",
-    // Kunci utama. 'self' menutupi skrip Next & Vercel Analytics (di-proxy
-    // same-origin); nonce menutupi skrip inline yang sah. 'unsafe-eval' hanya
-    // di dev karena React memakainya untuk pesan galat yang lebih kaya.
-    `script-src 'self' 'nonce-${nonce}'${isDev ? " 'unsafe-eval'" : ""}`,
-    // ws:/http: hanya di dev untuk hot-reload; di produksi cukup same-origin.
-    `connect-src 'self' https://va.vercel-scripts.com https://vitals.vercel-insights.com${
-      isDev ? " ws: http:" : ""
-    }`,
-    // upgrade-insecure-requests akan memaksa https — jangan di dev (localhost http).
-    ...(isDev ? [] : ["upgrade-insecure-requests"]),
-  ].join("; ");
+  const csp = susunCsp({ skripInline: `'nonce-${nonce}'`, dev: isDev });
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);
