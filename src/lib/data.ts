@@ -1,7 +1,6 @@
 import stagesJson from "@/data/stages.json";
 import downloadsJson from "@/data/downloads.json";
 import faqJson from "@/data/faq.json";
-import siteJson from "@/data/site.json";
 import scheduleJson from "@/data/schedule.json";
 import skpiJson from "@/data/skpi.json";
 import kalenderJson from "@/data/kalender-akademik.json";
@@ -12,13 +11,20 @@ import type {
   FaqItem,
   KalenderAkademik,
   ScheduleConfig,
-  SiteConfig,
   SkpiConfig,
   Stage,
   StagePhase,
 } from "@/lib/types";
 
-export const site = siteJson as SiteConfig;
+/*
+ * `site` pindah ke `@/lib/site` supaya komponen klien yang hanya butuh nama
+ * website — header, modal penyangkalan, panel dukungan — tidak ikut menyeret
+ * seluruh JSON yang diimpor berkas ini.
+ *
+ * Diteruskan kembali di sini demi pemanggil di sisi server, yang memang sudah
+ * memuat data lainnya.
+ */
+export { site } from "@/lib/site";
 
 export const schedule = scheduleJson as ScheduleConfig;
 

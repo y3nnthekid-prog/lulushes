@@ -6,7 +6,7 @@ import { Heart, Mail, MessageSquareWarning, QrCode } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { site } from "@/lib/data";
+import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 const KATEGORI = [

@@ -13,69 +13,20 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { allFaq, downloads, getStage, stages } from "@/lib/data";
+// Hanya tipe — impor tipe dihapus saat build, jadi datanya tidak ikut terseret.
+// Mengimpor `cari` dari modul yang sama akan membatalkan seluruh perubahan ini,
+// karena modul itu juga merakit `indeks` dari JSON.
+import type { ResultKind, SearchEntry } from "@/lib/indeks-pencarian";
 import { cn } from "@/lib/utils";
 
-type ResultKind = "Tahapan" | "Template" | "FAQ" | "Tips";
-
-type SearchEntry = {
-  id: string;
-  kind: ResultKind;
-  title: string;
-  subtitle: string;
-  href: string;
-  /** Teks gabungan yang dicocokkan dengan kata kunci. */
-  haystack: string;
-};
-
-/** Indeks dibangun sekali dari JSON — mencakup tahapan, template, FAQ, dan tips. */
-const index: SearchEntry[] = [
-  ...stages.map((stage) => ({
-    id: `stage-${stage.slug}`,
-    kind: "Tahapan" as const,
-    title: stage.title,
-    subtitle: `Tahap ${stage.order} · ${stage.estimatedDuration}`,
-    href: `/tahapan/${stage.slug}`,
-    haystack: [
-      stage.title,
-      stage.shortTitle,
-      stage.description,
-      stage.goal,
-      ...stage.requirements.map((r) => r.text),
-      ...stage.documents.map((d) => d.name),
-      ...stage.steps.map((s) => `${s.title} ${s.detail}`),
-      ...stage.checklist.map((c) => c.label),
-    ].join(" "),
-  })),
-  ...downloads.map((item) => ({
-    id: `download-${item.id}`,
-    kind: "Template" as const,
-    title: item.name,
-    subtitle: `${item.format} · ${getStage(item.stage)?.title ?? item.stage}`,
-    href: `/download#${item.id}`,
-    haystack: `${item.name} ${item.description} ${item.format}`,
-  })),
-  ...allFaq.map((item, i) => ({
-    id: `faq-${i}`,
-    kind: "FAQ" as const,
-    title: item.question,
-    subtitle: item.stage
-      ? (getStage(item.stage)?.title ?? "Umum")
-      : "Pertanyaan umum",
-    href: item.stage ? `/tahapan/${item.stage}#faq` : "/faq",
-    haystack: `${item.question} ${item.answer}`,
-  })),
-  ...stages.flatMap((stage) =>
-    stage.tips.map((tip, i) => ({
-      id: `tip-${stage.slug}-${i}`,
-      kind: "Tips" as const,
-      title: tip,
-      subtitle: `Tips alumni · ${stage.title}`,
-      href: `/tahapan/${stage.slug}#tips`,
-      haystack: tip,
-    })),
-  ),
-];
+/*
+ * Indeksnya pindah ke `@/lib/indeks-pencarian` dan dimuat belakangan.
+ *
+ * Kotak pencarian ini duduk di header setiap halaman. Selama indeksnya
+ * dirakit di sini, stages.json (77 KB), faq.json, dan downloads.json ikut ke
+ * bundel peramban di semua halaman — dan haystack tiap tahap, template, FAQ,
+ * serta tips dirangkai sebelum seorang pun menekan tombol cari.
+ */
 
 const kindIcon: Record<ResultKind, React.ElementType> = {
   Tahapan: FileText,
@@ -84,14 +35,14 @@ const kindIcon: Record<ResultKind, React.ElementType> = {
   Tips: Lightbulb,
 };
 
-function search(query: string): SearchEntry[] {
+/** Mencocokkan kata kunci; judul diprioritaskan, tahapan naik ke atas. */
+function cari(query: string, dari: SearchEntry[]): SearchEntry[] {
   const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
   if (terms.length === 0) return [];
-  return index
+  return dari
     .map((entry) => {
       const hay = entry.haystack.toLowerCase();
       if (!terms.every((t) => hay.includes(t))) return null;
-      // Kecocokan pada judul diprioritaskan, dan tahapan naik ke atas.
       const title = entry.title.toLowerCase();
       const titleHits = terms.filter((t) => title.includes(t)).length;
       const score = titleHits * 10 + (entry.kind === "Tahapan" ? 5 : 0);
@@ -106,9 +57,29 @@ function search(query: string): SearchEntry[] {
 export function SearchDialog() {
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState("");
+  const [indeks, setIndeks] = React.useState<SearchEntry[] | null>(null);
   const router = useRouter();
 
-  const results = React.useMemo(() => search(query), [query]);
+  /*
+   * Indeksnya diambil begitu kotak ini dibuka pertama kali, lalu disimpan.
+   * Impornya di dalam efek, bukan di puncak berkas, supaya datanya tidak ikut
+   * ke bundel awal — itu seluruh alasan perubahan ini.
+   */
+  React.useEffect(() => {
+    if (!open || indeks) return;
+    let batal = false;
+    import("@/lib/indeks-pencarian").then((m) => {
+      if (!batal) setIndeks(m.indeks);
+    });
+    return () => {
+      batal = true;
+    };
+  }, [open, indeks]);
+
+  const results = React.useMemo(
+    () => (indeks ? cari(query, indeks) : []),
+    [query, indeks],
+  );
 
   React.useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {

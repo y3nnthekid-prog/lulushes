@@ -8,6 +8,7 @@ import {
   stages,
   totalStages,
 } from "@/lib/data";
+import { starterQuestions } from "@/lib/pertanyaan-pembuka";
 import { formatRentang, formatTanggal } from "@/lib/tanggal";
 import type { SourceLevel } from "@/lib/types";
 
@@ -1044,13 +1045,9 @@ export function susunJawaban(question: string): Jawaban {
   return { teks: bagian.join("\n\n"), utama, terkait, kosong: false };
 }
 
-/** Pertanyaan pembuka yang menunjukkan apa saja yang bisa dijawab. */
-export const starterQuestions = [
-  "Berapa batas Turnitin skripsi?",
-  "Kapan pendaftaran sidang dibuka?",
-  "Syarat daftar munaqosyah apa saja?",
-  "Urutan tanda tangan setelah sidang?",
-  "Cara isi SKPI di AIS",
-  "Tenggat mana yang bikin mengulang?",
-];
+// Diteruskan kembali demi pemanggil lama. Berkas ini tetap memakainya sendiri
+// di `susunJawaban` sebagai saran ketika pertanyaannya tidak ketemu, jadi ia
+// diimpor di puncak berkas — `export ... from` saja tidak membuat binding
+// lokal, dan itu yang membuat percobaan pertama gagal dikompilasi.
+export { starterQuestions };
 

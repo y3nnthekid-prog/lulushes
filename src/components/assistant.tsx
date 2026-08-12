@@ -6,8 +6,9 @@ import { ArrowRight, MessageCircle, Send, Sparkles, X } from "lucide-react";
 
 import { SourceBadge } from "@/components/source-badge";
 import { Button } from "@/components/ui/button";
-import { starterQuestions, susunJawaban, type Answer } from "@/lib/assistant";
+import { starterQuestions } from "@/lib/pertanyaan-pembuka";
 import { cn } from "@/lib/utils";
+import type { Answer } from "@/lib/assistant";
 
 /** Rujukan halaman sumber yang ditempelkan di bawah jawaban. */
 type Cite = Pick<Answer, "id" | "kind" | "title" | "href" | "hrefLabel" | "source">;
@@ -45,8 +46,19 @@ const nextId = () => `m${++counter}`;
  * Dipakai kalau route server tidak bisa dihubungi. Penyusunnya sama persis
  * dengan yang dipakai server, jadi asisten tetap menjawab benar walau tanpa
  * jaringan — hanya kalimatnya apa adanya, tidak dirapikan model.
+ *
+ * Mesinnya diimpor DI DALAM fungsi, bukan di puncak berkas. Impor statis
+ * menyeret seluruh basis pengetahuan — 231 entri beserta stages.json,
+ * faq.json, dan downloads.json — ke bundel setiap halaman, dan lebih mahal
+ * lagi: entrinya dirakit di module scope, jadi peramban membangunnya sebelum
+ * siapa pun membuka asisten. Terukur 22 KB gzip dan 341 milidetik long task
+ * di desktop; di ponsel kelas menengah 1,4–2 detik main thread terkunci.
+ *
+ * Dibayar oleh semua orang, untuk jalur yang hanya menyala ketika servernya
+ * tak terjangkau. Sekarang ongkosnya dibayar saat itu benar-benar terjadi.
  */
-function localAnswer(question: string): Balasan {
+async function localAnswer(question: string): Promise<Balasan> {
+  const { susunJawaban } = await import("@/lib/assistant");
   const jawaban = susunJawaban(question);
   return {
     text: jawaban.teks,
@@ -120,7 +132,7 @@ export function Assistant() {
               "Terlalu banyak pertanyaan dalam waktu singkat. Coba lagi sebentar lagi.",
           };
         } else if (!response.ok) {
-          reply = localAnswer(dikirim);
+          reply = await localAnswer(dikirim);
         } else {
           const body = (await response.json()) as ApiReply;
           reply = {
@@ -132,7 +144,7 @@ export function Assistant() {
         }
       } catch {
         // Jaringan putus atau route belum ada — hitung sendiri di browser.
-        reply = localAnswer(dikirim);
+        reply = await localAnswer(dikirim);
       }
 
       if (reply.answer) terakhirRef.current = reply.answer.title;

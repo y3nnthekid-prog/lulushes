@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { site } from "@/lib/data";
+import { site } from "@/lib/site";
 import { useProgress } from "@/lib/progress";
 
 /**

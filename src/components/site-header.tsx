@@ -27,7 +27,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { site } from "@/lib/data";
+import { site } from "@/lib/site";
 import { halaman } from "@/lib/navigasi";
 import { useProgress } from "@/lib/progress";
 import { cn } from "@/lib/utils";
