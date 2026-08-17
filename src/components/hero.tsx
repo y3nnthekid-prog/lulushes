@@ -30,7 +30,7 @@ export function Hero() {
 
   return (
     <section className="px-4 pt-4">
-      <div className="aurora grain surface-brand relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] border border-white/30 px-6 py-12 shadow-2xl shadow-brand/10 sm:px-10 sm:py-16">
+      <div className="aurora grain surface-brand relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] border border-brand/20 px-6 py-12 shadow-xl shadow-brand/10 sm:px-10 sm:py-16">
         {/* Living interactive particle canvas */}
         <InteractiveParticleCanvas
           particleColor="rgba(156, 15, 80, 0.45)"
@@ -71,11 +71,11 @@ export function Hero() {
         </div>
 
         <div className="relative z-1 inline-flex items-center gap-2 rounded-full bg-white/70 px-3.5 py-1 text-xs font-semibold text-surface-accent shadow-xs ring-1 ring-black/5 backdrop-blur-md">
-          <span
-            className="pulse-ring relative size-2 rounded-full bg-surface-accent"
-            aria-hidden
-          />
-          {site.program} · {site.faculty}
+          <span className="relative flex size-2 shrink-0">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-surface-accent opacity-75" />
+            <span className="relative inline-flex size-2 rounded-full bg-surface-accent" />
+          </span>
+          {site.program} • {site.faculty}
         </div>
 
         {/* Judul kinetik */}
@@ -125,16 +125,14 @@ export function Hero() {
 
         {/* Ajakan utama dengan haptic spring feel */}
         <div className="relative z-1 mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <span className="pulse-ring relative inline-flex w-full rounded-xl sm:w-auto">
-            <WizardDialog
-              label="Cek, aku di tahap mana?"
-              className="w-full bg-surface-accent text-white shadow-xl shadow-brand/35 transition-all duration-200 hover:scale-[1.03] hover:bg-surface-accent/90 active:scale-[0.98] sm:w-auto"
-            />
-          </span>
+          <WizardDialog
+            label="Cek, aku di tahap mana?"
+            className="w-full rounded-xl bg-surface-accent text-white shadow-lg shadow-brand/30 transition-all duration-200 hover:scale-[1.02] hover:bg-surface-accent/90 active:scale-[0.98] sm:w-auto"
+          />
           <LinkButton
             href="/roadmap"
             size="lg"
-            className="border-black/15 bg-white/80 text-pop-foreground backdrop-blur-md transition-all duration-200 hover:scale-[1.02] hover:bg-white active:scale-[0.98] dark:border-black/15 dark:bg-white/80 dark:hover:bg-white"
+            className="rounded-xl border-black/15 bg-white/80 text-pop-foreground backdrop-blur-md transition-all duration-200 hover:scale-[1.02] hover:bg-white active:scale-[0.98] dark:border-black/15 dark:bg-white/80 dark:hover:bg-white"
             variant="outline"
           >
             Lihat roadmap

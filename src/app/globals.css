@@ -400,27 +400,23 @@
 
   /*
    * Aurora pink yang terus bergerak di belakang hero.
-   *
-   * Dua gumpalan pertama sempat terlalu samar untuk terlihat sebagai gerakan.
-   * Sekarang lebih pekat, jangkauannya lebih jauh, dan ada gumpalan ketiga
-   * dengan ritme berbeda supaya polanya tidak pernah terasa berulang.
    */
   .aurora::before,
   .aurora::after {
     content: "";
     position: absolute;
     border-radius: 9999px;
-    filter: blur(52px);
+    filter: blur(48px);
     pointer-events: none;
-    opacity: 0.95;
+    opacity: 0.85;
   }
   .aurora::before {
-    inset: -40% 35% 25% -30%;
+    inset: -10% 25% 15% -10%;
     background: radial-gradient(circle, var(--pop), transparent 66%);
     animation: aurora-a 13s ease-in-out infinite;
   }
   .aurora::after {
-    inset: 15% -35% -45% 40%;
+    inset: 10% -15% -20% 30%;
     background: radial-gradient(circle, #fff0f7, transparent 64%);
     animation: aurora-b 16s ease-in-out infinite;
   }
@@ -428,10 +424,10 @@
      punya dua pseudo-element. */
   .aurora-3 {
     position: absolute;
-    inset: 40% 20% -30% 10%;
+    inset: 25% 15% -15% 10%;
     border-radius: 9999px;
-    filter: blur(60px);
-    opacity: 0.7;
+    filter: blur(52px);
+    opacity: 0.6;
     pointer-events: none;
     background: radial-gradient(circle, #ffb3d9, transparent 62%);
     animation: aurora-c 19s ease-in-out infinite;
