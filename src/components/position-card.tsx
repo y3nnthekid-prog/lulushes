@@ -6,6 +6,7 @@ import { ArrowRight, MapPin } from "lucide-react";
 import { LinkButton } from "@/components/link-button";
 import { ProgressRing } from "@/components/progress-ring";
 import { StageIcon } from "@/components/stage-icon";
+import { TiltCard } from "@/components/tilt-card";
 import { WizardDialog } from "@/components/wizard-dialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { getStage, totalStages } from "@/lib/data";
@@ -14,19 +15,16 @@ import { useProgress } from "@/lib/progress";
 import { cn } from "@/lib/utils";
 
 /**
- * Kartu "Posisi Anda". Menjawab empat pertanyaan inti sekaligus:
- * saya di mana, sejauh apa progresnya, apa yang harus dikerjakan sekarang,
- * dan apa langkah berikutnya.
+ * Kartu "Posisi Anda" dengan 60fps 3D perspective tilt & layout bersih.
  */
 export function PositionCard({ className }: { className?: string }) {
   const { hydrated, currentStage, stageProgress, overall, nextAction } =
     useProgress();
 
   if (!hydrated) {
-    // Placeholder setinggi kartu asli supaya layout tidak melompat saat hidrasi.
     return (
-      <Card className={cn("animate-pulse", className)}>
-        <CardContent className="h-52" />
+      <Card className={cn("animate-pulse border-border/60 bg-card", className)}>
+        <CardContent className="h-60" />
       </Card>
     );
   }
@@ -37,54 +35,62 @@ export function PositionCard({ className }: { className?: string }) {
   const remaining = totalStages - currentStage.order;
 
   return (
-    <Card className={cn("relative overflow-hidden pt-0", className)}>
-      {/* Pita fase di tepi atas kartu */}
-      <div className={cn("h-1.5 w-full", phase.dot)} aria-hidden />
-
-      <CardContent className="space-y-4">
-        <div className="flex items-start gap-4">
+    <TiltCard
+      maxTilt={4}
+      glowColor="rgba(255, 79, 163, 0.08)"
+      className={className}
+      cardClassName="border-border/80 bg-card/90 backdrop-blur-xl shadow-md"
+    >
+      <div className="p-5 sm:p-6 space-y-4">
+        <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <p className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-              <MapPin className="size-3.5" aria-hidden />
-              Posisi kamu
-            </p>
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-semibold text-brand">
+              <span className="relative flex size-2 shrink-0">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75" />
+                <span className="relative inline-flex size-2 rounded-full bg-brand" />
+              </span>
+              <MapPin className="size-3.5 shrink-0" aria-hidden />
+              <span>Posisi kamu sekarang</span>
+            </div>
 
-            <h2 className="mt-1.5 font-heading text-lg leading-tight font-semibold text-balance">
+            <h2 className="mt-2.5 font-heading text-xl leading-tight font-bold tracking-tight text-balance text-foreground">
               <Link
                 href={`/tahapan/${currentStage.slug}`}
-                className="underline-offset-4 hover:underline"
+                className="transition-colors hover:text-brand"
               >
                 {currentStage.title}
               </Link>
             </h2>
 
-            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+            <div className="mt-2.5 flex flex-wrap items-center gap-2">
               <span
                 className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium",
+                  "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold shadow-xs",
                   phase.soft,
                 )}
               >
-                <StageIcon name={currentStage.icon} className="size-3" />
+                <StageIcon name={currentStage.icon} className="size-3.5" />
                 {currentStage.phase}
               </span>
-              <span className="text-xs text-muted-foreground">
-                Tahap {currentStage.order}/{totalStages}
+              <span className="rounded-md bg-muted/60 px-2 py-0.5 text-xs font-medium text-muted-foreground tabular-nums">
+                Tahap {currentStage.order} dari {totalStages}
               </span>
             </div>
           </div>
 
-          <ProgressRing
-            percent={overall.percent}
-            label={`${progress.done}/${progress.total}`}
-          />
+          <div className="shrink-0 transition-transform duration-200 hover:scale-105">
+            <ProgressRing
+              percent={overall.percent}
+              label={`${progress.done}/${progress.total}`}
+            />
+          </div>
         </div>
 
-        <div className="rounded-xl bg-brand-soft p-3">
-          <p className="text-xs font-medium text-muted-foreground">
-            Yang harus kamu lakukan sekarang
+        <div className="rounded-xl border border-border/80 bg-muted/40 p-3.5 backdrop-blur-sm">
+          <p className="text-[11px] font-semibold tracking-wider text-brand uppercase">
+            Aksi Berikutnya
           </p>
-          <p className="mt-1 text-sm font-medium text-balance">
+          <p className="mt-1 text-sm font-medium text-balance text-foreground">
             {nextAction
               ? nextAction.label
               : `Semua langkah tahap ini selesai. Lanjut ke ${
@@ -93,38 +99,38 @@ export function PositionCard({ className }: { className?: string }) {
           </p>
         </div>
 
-        <div className="flex flex-col gap-2 sm:flex-row">
+        <div className="space-y-2">
           <LinkButton
             href={`/tahapan/${currentStage.slug}`}
-            className="flex-1"
+            className="w-full shadow-md shadow-brand/20 transition-transform duration-200 hover:scale-[1.01] active:scale-[0.98]"
           >
-            Buka tahap ini
+            Buka Panduan Tahap
             <ArrowRight aria-hidden data-icon="inline-end" />
           </LinkButton>
           <WizardDialog
-            label="Bukan di sini?"
+            label="Bukan di sini? Cek ulang posisi"
             variant="outline"
-            size="default"
-            className="flex-1"
+            size="sm"
+            className="w-full border-border/80 text-xs font-medium transition-colors hover:bg-muted"
           />
         </div>
 
         <p className="text-xs text-muted-foreground">
           {remaining === 0 || !next ? (
-            "Ini tahap terakhir."
+            "🎉 Ini adalah tahap akhir kelulusanmu!"
           ) : (
             <>
-              {remaining} tahap lagi. Setelah ini:{" "}
+              Tersisa <strong className="text-foreground tabular-nums">{remaining} tahap</strong> lagi. Setelah ini:{" "}
               <Link
                 href={`/tahapan/${next.slug}`}
-                className="font-medium underline underline-offset-3 hover:text-foreground"
+                className="font-medium text-brand underline underline-offset-3 hover:text-foreground"
               >
                 {next.title}
               </Link>
             </>
           )}
         </p>
-      </CardContent>
-    </Card>
+      </div>
+    </TiltCard>
   );
 }

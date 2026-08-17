@@ -6,8 +6,10 @@ import {
   ExternalLink,
   FileText,
   FolderDown,
+  Gamepad2,
   ListChecks,
   MapPin,
+  MessageCircleQuestion,
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
@@ -18,12 +20,12 @@ import { LinkButton } from "@/components/link-button";
 import { PositionCard } from "@/components/position-card";
 import { Reveal } from "@/components/reveal";
 import { Roadmap } from "@/components/roadmap";
+import { TiltCard } from "@/components/tilt-card";
 import {
   JAM_TENGGAT,
   getStagesByPhase,
   phases,
   schedule,
-  site,
   totalStages,
 } from "@/lib/data";
 import { phaseStyle } from "@/lib/phase";
@@ -38,7 +40,7 @@ const questions = [
   {
     icon: ListChecks,
     question: "Sekarang ngapain?",
-    answer: "Langkah berurutan dan checklist yang tersimpan sendiri.",
+    answer: "Langkah berurutan dan checklist yang tersimpan sendiri secara otomatis.",
   },
   {
     icon: FolderDown,
@@ -48,137 +50,129 @@ const questions = [
   {
     icon: ArrowRight,
     question: "Habis ini apa?",
-    answer: "Tiap halaman menutup dengan tahap sesudahnya.",
+    answer: "Tiap halaman menutup dengan rincian tahap sesudahnya.",
   },
 ];
 
-/*
- * Kanonik beranda.
- *
- * Sebelumnya nilai ini disetel di layout dan otomatis diwarisi SELURUH
- * halaman — akibatnya setiap halaman mengaku duplikat beranda, dan mesin
- * pencari diberi tahu bahwa website ini cuma punya satu halaman. Sekarang
- * tiap halaman menyatakan alamatnya sendiri.
- */
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
 export default function HomePage() {
   return (
-    <div>
+    <div className="space-y-16 pb-16">
       <Hero />
 
-      <div className="mx-auto max-w-5xl px-4">
-        {/* Posisi pengguna + empat pertanyaan */}
-        <section className="grid gap-6 py-12 lg:grid-cols-[21rem_1fr] lg:items-start">
+      <div className="mx-auto max-w-5xl px-4 space-y-16">
+        {/* Bento Grid: Posisi Kamu & Chat Senior 23:47 */}
+        <section className="grid gap-6 grid-cols-1 lg:grid-cols-[21.5rem_1fr] lg:items-start">
           <Reveal>
-            <PositionCard />
+            <PositionCard className="w-full" />
           </Reveal>
 
           <Reveal delay={90} className="lg:pt-1">
-            <h2 className="font-heading text-xl font-semibold text-balance sm:text-2xl">
-              Empat pertanyaan yang bikin kamu chat senior jam 11 malam
-            </h2>
-            <p className="mt-2 max-w-md text-sm text-muted-foreground">
-              Semuanya sudah dijawab di sini. Setiap halaman menjawab keempatnya
-              sekaligus — tidak ada yang digantung.
-            </p>
+            <div className="rounded-3xl border border-border/80 bg-card/60 p-6 sm:p-8 backdrop-blur-xl shadow-lg">
+              <div className="flex items-center gap-2">
+                <span className="flex size-7 items-center justify-center rounded-lg bg-brand/15 text-brand">
+                  <MessageCircleQuestion className="size-4" aria-hidden />
+                </span>
+                <span className="text-xs font-semibold uppercase tracking-wider text-brand">
+                  Solusi Praktis Mahasiswa
+                </span>
+              </div>
 
-            {/*
-             * Dulu empat kartu seragam berjajar 2x2 — ikon di kotak bulat,
-             * judul, satu baris keterangan, keempatnya persis sama. Susunan
-             * itu benar tapi tidak mengatakan apa-apa, dan justru membuang
-             * kalimat terbaik di seksi ini: "chat senior jam 11 malam".
-             *
-             * Sekarang bentuknya utas percakapan. Pertanyaan rata kanan
-             * seperti pesan yang kamu kirim, jawaban rata kiri seperti balasan
-             * yang datang. Asimetrinya lahir dari isinya sendiri, bukan
-             * ditempelkan, dan lebar tiap gelembung mengikuti panjang
-             * kalimatnya — jadi tidak ada dua baris yang sama persis.
-             *
-             * <dl> dipakai karena ini memang pasangan tanya-jawab: dt untuk
-             * pertanyaan, dd untuk jawabannya. Bentuknya menyerupai chat, tapi
-             * strukturnya tetap jujur bagi pembaca layar.
-             */}
-            <p className="mt-5 flex items-center gap-2 text-xs text-muted-foreground">
-              <span className="h-px flex-1 bg-border" aria-hidden />
-              23.47
-              <span className="h-px flex-1 bg-border" aria-hidden />
-            </p>
+              <h2 className="mt-3 font-heading text-2xl font-bold tracking-tight text-balance sm:text-3xl">
+                Empat pertanyaan yang bikin kamu chat senior jam 11 malam
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                Semuanya sudah dijawab lengkap di sini. Setiap halaman menjawab
+                keempatnya sekaligus — tidak ada lagi informasi yang digantung.
+              </p>
 
-            <dl className="mt-3 space-y-4">
-              {questions.map(({ icon: Icon, question, answer }, i) => (
-                // Reveal merender <div>. Kalau ia membungkus dt/dd, susunannya
-                // jadi dl > div > div > dt — terlalu dalam, dan pasangan
-                // tanya-jawabnya putus bagi pembaca layar. Jadi dt/dd yang
-                // membungkus Reveal, bukan sebaliknya.
-                <div key={question} className="space-y-1.5">
-                  <dt className="flex justify-end">
-                    <Reveal
-                      delay={140 + i * 110}
-                      className="max-w-[85%] rounded-2xl rounded-br-sm bg-brand px-4 py-2.5 text-sm font-medium text-brand-foreground shadow-sm"
-                    >
-                      {question}
-                    </Reveal>
-                  </dt>
+              <div className="mt-5 flex items-center gap-2 text-xs font-mono text-muted-foreground">
+                <span className="h-px flex-1 bg-border" aria-hidden />
+                <span className="rounded-full bg-muted px-2.5 py-0.5 font-semibold text-brand">
+                  23.47 WIB
+                </span>
+                <span className="h-px flex-1 bg-border" aria-hidden />
+              </div>
 
-                  <dd className="flex justify-start pr-6">
-                    <Reveal
-                      delay={200 + i * 110}
-                      className="card-lift flex max-w-[92%] items-start gap-2.5 rounded-2xl rounded-bl-sm border bg-card px-4 py-2.5 text-sm"
-                    >
-                      <Icon
-                        className="mt-0.5 size-4 shrink-0 text-brand"
-                        aria-hidden
-                      />
-                      <span className="text-muted-foreground">{answer}</span>
-                    </Reveal>
-                  </dd>
-                </div>
-              ))}
-            </dl>
+              <dl className="mt-5 space-y-4">
+                {questions.map((item, i) => (
+                  <div key={item.question} className="space-y-1.5">
+                    <dt className="flex justify-end">
+                      <Reveal
+                        delay={140 + i * 90}
+                        className="max-w-[88%] rounded-2xl rounded-br-xs bg-brand px-4 py-2.5 text-sm font-semibold text-brand-foreground shadow-md shadow-brand/20 transition-transform duration-200 hover:scale-[1.02]"
+                      >
+                        {item.question}
+                      </Reveal>
+                    </dt>
+                    <dd className="flex justify-start pr-4 sm:pr-8">
+                      <Reveal
+                        delay={180 + i * 90}
+                        className="card-lift flex max-w-[94%] items-start gap-3 rounded-2xl rounded-bl-xs border border-border/90 bg-card/90 px-4 py-3 text-sm shadow-xs backdrop-blur-sm"
+                      >
+                        <item.icon
+                          className="mt-0.5 size-4.5 shrink-0 text-brand"
+                          aria-hidden
+                        />
+                        <span className="text-foreground/90 font-medium leading-relaxed">
+                          {item.answer}
+                        </span>
+                      </Reveal>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
           </Reveal>
         </section>
 
-        {/* Perjalanan: pita fase + roadmap ringkas, digabung jadi satu seksi
-            supaya halaman depan tidak memanjang tanpa perlu. */}
-        <section className="border-t py-12">
+        {/* Perjalananmu, Empat Fase */}
+        <section className="rounded-3xl border border-border/80 bg-card/40 p-6 sm:p-8 backdrop-blur-md shadow-lg">
           <Reveal>
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              {/* Seksi inti website — dinaikkan satu tingkat supaya tidak
-                  berbunyi sama kerasnya dengan seksi pendukung di sekitarnya. */}
-              <h2 className="font-heading text-2xl font-semibold tracking-tight sm:text-3xl">
-                Perjalananmu, empat fase
-              </h2>
-              <LinkButton href="/roadmap" variant="outline" size="sm">
-                Roadmap lengkap
-                <ArrowRight aria-hidden data-icon="inline-end" />
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div>
+                <span className="text-xs font-semibold uppercase tracking-wider text-brand">
+                  Navigasi Runtut
+                </span>
+                <h2 className="mt-1 font-heading text-2xl font-bold tracking-tight sm:text-3xl">
+                  Perjalananmu, empat fase
+                </h2>
+              </div>
+              <LinkButton
+                href="/roadmap"
+                variant="outline"
+                size="sm"
+                className="gap-1.5 border-brand/30 bg-background/80 hover:bg-brand-soft hover:text-brand"
+              >
+                Buka Roadmap Lengkap
+                <ArrowRight className="size-3.5" aria-hidden data-icon="inline-end" />
               </LinkButton>
             </div>
 
-            <div
-              className="journey-bar mt-4 h-2.5 w-full rounded-full"
-              aria-hidden
-            />
+            <div className="journey-bar mt-5 h-3 w-full rounded-full" aria-hidden />
 
-            <ol className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <ol className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {phases.map((phase) => {
+                const count = getStagesByPhase(phase).length;
                 const style = phaseStyle(phase);
-                const inPhase = getStagesByPhase(phase);
                 return (
-                  <li key={phase} className="flex items-center gap-2">
+                  <li
+                    key={phase}
+                    className="flex items-center gap-3 rounded-xl border border-border/60 bg-card/70 p-2.5 transition-transform duration-200 hover:scale-[1.02]"
+                  >
                     <span
-                      className={cn("size-2.5 shrink-0 rounded-full", style.dot)}
+                      className={cn("size-3.5 shrink-0 rounded-full shadow-xs", style.dot)}
                       aria-hidden
                     />
                     <span className="min-w-0">
-                      <span className="block truncate text-sm font-medium">
+                      <span className="block truncate text-sm font-semibold">
                         {phase}
                       </span>
                       <span className="block text-xs text-muted-foreground tabular-nums">
-                        Tahap {inPhase[0].order}–
-                        {inPhase[inPhase.length - 1].order}
+                        {count} tahapan
                       </span>
                     </span>
                   </li>
@@ -192,167 +186,170 @@ export default function HomePage() {
           </Reveal>
         </section>
 
-        {/* Siklus ujian bulanan */}
-        <section className="border-t py-12">
-          {/*
-           * Seksi ini sengaja dibalik hierarkinya.
-           *
-           * Judulnya turun jadi label kecil, dan yang membesar adalah jam
-           * tenggatnya. Alasannya sederhana: "Siklus ujian bulanan" cuma nama
-           * seksi, sedangkan 16.00 adalah satu-satunya angka di halaman ini
-           * yang kalau terlewat bisa membuat orang mengulang satu periode.
-           * Sebelumnya angka itu terkubur di tengah paragraf abu-abu dengan
-           * ukuran yang sama dengan teks penjelas biasa.
-           *
-           * Ini juga yang memecah nada tipografi halaman: sesudah hero, semua
-           * judul seksi berukuran nyaris sama, jadi tidak ada satu pun momen
-           * yang terasa lebih penting dari yang lain.
-           */}
+        {/* Siklus Ujian Bulanan & Deadline 16.00 WIB */}
+        <section className="rounded-3xl border border-border/80 bg-gradient-to-b from-card/80 to-card/40 p-6 sm:p-8 backdrop-blur-xl shadow-xl">
           <Reveal>
             <div className="flex items-center gap-2.5">
-              <span className="flex size-9 items-center justify-center rounded-xl bg-blush text-blush-foreground">
-                <CalendarClock className="size-4.5" aria-hidden />
+              <span className="flex size-9 items-center justify-center rounded-xl bg-brand/15 text-brand shadow-xs">
+                <CalendarClock className="size-5" aria-hidden />
               </span>
-              <h2 className="font-heading text-xs font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+              <h2 className="font-heading text-xs font-bold tracking-[0.18em] text-brand uppercase">
                 {schedule.heading}
               </h2>
             </div>
 
-            {/*
-             * Batas atasnya (4rem) sengaja di bawah batas atas judul hero
-             * (4,75rem). Percobaan pertama memakai 14vw tanpa batas serendah
-             * itu, dan hasilnya angka ini justru lebih besar daripada judul
-             * halaman di layar lebar — momen besar berubah jadi hierarki yang
-             * terbalik. Di layar sempit ia tetap boleh menonjol: keduanya
-             * tidak pernah terlihat bersamaan di sana.
-             */}
-            <p className="mt-5 font-heading text-[clamp(2.75rem,8vw,4rem)] leading-[0.88] font-bold tracking-tight tabular-nums">
-              {JAM_TENGGAT}
-              <span className="ml-2.5 align-baseline text-[0.26em] font-semibold tracking-normal text-muted-foreground">
-                WIB
+            <div className="mt-4 flex flex-col sm:flex-row sm:items-baseline gap-2">
+              <p className="font-heading text-[clamp(3.2rem,9vw,4.5rem)] leading-[0.88] font-black tracking-tight tabular-nums text-foreground">
+                {JAM_TENGGAT}
+                <span className="ml-3 align-baseline text-[0.32em] font-bold tracking-normal text-brand">
+                  WIB
+                </span>
+              </p>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-brand/15 px-3 py-1 text-xs font-semibold text-brand">
+                <span className="size-2 rounded-full bg-brand animate-ping" />
+                Tenggat Keras Bulanan
               </span>
-            </p>
-            <p className="mt-3 max-w-md text-base font-medium text-balance">
+            </div>
+
+            <p className="mt-3 max-w-lg text-base font-semibold text-balance text-foreground">
               Jam yang sama untuk setiap pendaftaran ujian — apa pun ujiannya,
               periode ke berapa pun.
             </p>
 
-            <p className="mt-4 max-w-2xl text-sm text-muted-foreground">
+            <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
               {schedule.intro}
             </p>
           </Reveal>
 
-          <div className="mt-5 grid gap-3 md:grid-cols-3">
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
             {schedule.exams.map((exam, i) => (
-              <Reveal
-                key={exam.id}
-                delay={90 + i * 80}
-                className="card-lift flex flex-col rounded-2xl border bg-card p-4"
-              >
-                <h3 className="font-heading text-sm font-semibold">
-                  {exam.name}
-                </h3>
-                <p className="mt-2 flex-1 text-sm text-muted-foreground">
-                  {exam.schedulePattern}
-                </p>
-                <p className="mt-3 rounded-lg bg-blush/25 px-2.5 py-1.5 text-xs font-medium text-blush-foreground dark:text-blush">
-                  Tenggat: {exam.deadlinePattern}
-                </p>
-                <a
-                  href={exam.registrationUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-brand underline-offset-4 hover:underline pointer-coarse:min-h-11"
+              <Reveal key={exam.id} delay={90 + i * 80}>
+                <TiltCard
+                  maxTilt={5}
+                  className="h-full"
+                  cardClassName="card-lift flex flex-col h-full rounded-2xl border-border/90 bg-card p-5 shadow-sm"
                 >
-                  Buka form pendaftaran
-                  <ExternalLink className="size-3.5" aria-hidden />
-                </a>
+                  <div className="flex items-center justify-between">
+                    <span className="rounded-md bg-muted px-2 py-0.5 text-[11px] font-mono font-semibold text-muted-foreground uppercase">
+                      Ujian #{i + 1}
+                    </span>
+                    <span className="size-2 rounded-full bg-brand" />
+                  </div>
+                  <h3 className="mt-3 font-heading text-base font-bold text-foreground">
+                    {exam.name}
+                  </h3>
+                  <p className="mt-2 flex-1 text-sm text-muted-foreground leading-relaxed">
+                    {exam.schedulePattern}
+                  </p>
+                  <div className="mt-4 rounded-xl border border-brand/20 bg-brand-soft/80 px-3 py-2 text-xs font-semibold text-brand">
+                    Tenggat: {exam.deadlinePattern}
+                  </div>
+                  <a
+                    href={exam.registrationUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand underline-offset-4 hover:underline pointer-coarse:min-h-11"
+                  >
+                    Buka Formulir Pendaftaran
+                    <ExternalLink className="size-3.5" aria-hidden />
+                  </a>
+                </TiltCard>
               </Reveal>
             ))}
           </div>
 
           <Reveal delay={140}>
-            <p className="mt-4 rounded-xl border border-warn/30 bg-warn-muted p-3 text-xs text-foreground/80">
-              {schedule.warning}
+            <p className="mt-5 rounded-2xl border border-warn/30 bg-warn-muted/80 p-4 text-xs font-medium text-foreground/90 flex items-start gap-2.5 backdrop-blur-sm">
+              <span className="font-bold text-warn shrink-0">⚠️ PENTING:</span>
+              <span>{schedule.warning}</span>
             </p>
           </Reveal>
         </section>
 
-        {/* Kalender akademik: di sini cuma ringkasannya.
-            Kalender penuhnya setinggi 1.238 piksel — hampir dua layar ponsel
-            untuk satu seksi beranda — jadi ia pindah ke /kalender. Yang
-            tertinggal menjawab satu pertanyaan saja: ada yang harus kukerjakan
-            hari ini? */}
-        <section className="border-t py-12">
+        {/* Kalender Akademik Ringkas */}
+        <section className="rounded-3xl border border-border/80 bg-card/50 p-6 sm:p-8 backdrop-blur-md shadow-lg">
           <Reveal>
             <KalenderRingkas />
           </Reveal>
         </section>
 
-        {/* Ajakan main + dasar informasi, disatukan dalam satu bidang pink
-            supaya penutup halaman tidak jadi dua blok besar berturut-turut. */}
-        <section className="border-t py-12">
-          <Reveal className="grain surface-brand relative overflow-hidden rounded-3xl p-6 sm:p-8">
-            <div className="relative z-1 grid gap-6 sm:grid-cols-[1fr_auto] sm:items-center">
-              <div>
-                <span className="flex size-10 items-center justify-center rounded-xl bg-white/60 text-surface-accent">
-                  <ShieldCheck className="size-5" aria-hidden />
+        {/* Asymmetrical Bento Lounge: Download Center + Ruang Main */}
+        <section>
+          <Reveal className="grid gap-6 grid-cols-1 lg:grid-cols-12 items-stretch">
+            {/* Download Center & Dasar Informasi (7 Kolom di Desktop) */}
+            <div className="lg:col-span-7 grain surface-brand relative overflow-hidden rounded-[2rem] border border-white/20 p-6 sm:p-8 flex flex-col justify-between shadow-xl min-h-[300px]">
+              <div className="relative z-1">
+                <span className="flex size-11 items-center justify-center rounded-2xl bg-white/70 text-surface-accent shadow-md shadow-brand/20">
+                  <ShieldCheck className="size-6" aria-hidden />
                 </span>
-                <h2 className="mt-4 font-heading text-lg font-semibold">
+                <h2 className="mt-4 font-heading text-xl font-bold">
                   Dasar informasi di website ini
                 </h2>
-                <p className="mt-2 max-w-2xl text-sm text-pop-foreground/80">
+                <p className="mt-2 text-sm text-pop-foreground/85 leading-relaxed">
                   Persyaratan berlabel{" "}
-                  <strong className="text-surface-accent">Resmi</strong> mengacu
-                  pada Surat {site.officialSource.issuer} No.{" "}
-                  {site.officialSource.number} tanggal {site.officialSource.date}.
+                  <strong className="text-surface-accent font-bold">Resmi</strong>{" "}
+                  mengacu pada SK Dekan Fakultas Syariah dan Hukum.
                   Selebihnya berlabel{" "}
-                  <strong className="text-surface-accent">Alumni</strong> —
-                  praktik umum yang tetap perlu kamu konfirmasi ke Prodi.
+                  <strong className="text-surface-accent font-bold">Alumni</strong>{" "}
+                  — praktik lapangan umum yang tetap perlu kamu konfirmasi ke Prodi.
                 </p>
-                <div className="mt-5 flex flex-wrap gap-2">
-                  <LinkButton
-                    href="/tentang"
-                    size="sm"
-                    className="bg-surface-accent text-white hover:bg-surface-accent/85"
-                  >
-                    <FileText aria-hidden />
-                    Tentang website ini
-                  </LinkButton>
-                  <Link
-                    href="/download"
-                    className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-pop-foreground/80 hover:text-pop-foreground pointer-coarse:min-h-11"
-                  >
-                    <FolderDown className="size-4" aria-hidden />
-                    Download Center
-                  </Link>
+              </div>
+
+              <div className="relative z-1 mt-6 flex flex-wrap gap-2.5">
+                <LinkButton
+                  href="/tentang"
+                  size="sm"
+                  className="bg-surface-accent text-white shadow-md shadow-brand/30 hover:bg-surface-accent/85"
+                >
+                  <FileText aria-hidden />
+                  Tentang website ini
+                </LinkButton>
+                <Link
+                  href="/download"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-white/70 px-3.5 py-2 text-sm font-semibold text-pop-foreground shadow-xs transition-transform hover:scale-105 hover:bg-white pointer-coarse:min-h-11"
+                >
+                  <FolderDown className="size-4" aria-hidden />
+                  Download 25 Template
+                </Link>
+              </div>
+            </div>
+
+            {/* Ruang Main 3D Card (5 Kolom di Desktop) */}
+            <TiltCard
+              maxTilt={7}
+              className="lg:col-span-5"
+              cardClassName="glass-surface border-white/20 p-6 sm:p-8 flex flex-col justify-between rounded-[2rem] shadow-xl group cursor-pointer min-h-[300px]"
+            >
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="flex size-11 items-center justify-center rounded-2xl bg-brand text-brand-foreground shadow-md shadow-brand/30">
+                    <Sparkles className="size-6" aria-hidden />
+                  </span>
+                  <span className="rounded-full bg-brand/20 px-3 py-1 text-xs font-semibold text-brand">
+                    4 Mini Games
+                  </span>
                 </div>
+
+                <h3 className="mt-5 font-heading text-xl font-bold text-foreground">
+                  Lagi jenuh nulis skripsi?
+                </h3>
+                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                  Uji pemahaman alur kelulusanmu lewat game interaktif: Blast Berkas, Lari Wisuda, Tebak Tahap, dan Urutkan Alur!
+                </p>
               </div>
 
               <Link
                 href="/main"
-                className="miring group flex items-center gap-3 rounded-2xl bg-white/70 p-4 shadow-sm ring-1 ring-white/70 sm:w-56 sm:flex-col sm:items-start"
+                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 px-4 font-semibold text-sm text-brand-foreground shadow-lg shadow-brand/25 transition-all duration-200 group-hover:scale-[1.02] active:scale-[0.98]"
               >
-                <span className="flex size-10 items-center justify-center rounded-xl bg-surface-accent text-white">
-                  <Sparkles className="size-5" aria-hidden />
-                </span>
-                <span>
-                  <span className="block font-heading text-sm font-semibold text-pop-foreground">
-                    Lagi jenuh baca?
-                  </span>
-                  <span className="mt-0.5 block text-xs text-pop-foreground/75">
-                    Uji hafalan alurmu lewat dua mini game.
-                  </span>
-                  <span className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-surface-accent">
-                    Masuk Ruang Main
-                    <ArrowRight
-                      className="size-3.5 transition-transform group-hover:translate-x-0.5"
-                      aria-hidden
-                    />
-                  </span>
-                </span>
+                <Gamepad2 className="size-4" aria-hidden />
+                Masuk Ruang Main
+                <ArrowRight
+                  className="size-4 transition-transform group-hover:translate-x-1"
+                  aria-hidden
+                />
               </Link>
-            </div>
+            </TiltCard>
           </Reveal>
         </section>
       </div>

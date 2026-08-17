@@ -1,32 +1,20 @@
+"use client";
+
 import * as React from "react";
 import { ArrowRight, MousePointerClick } from "lucide-react";
 
 import { CountUp } from "@/components/count-up";
+import { InteractiveParticleCanvas } from "@/components/interactive-particle-canvas";
 import { KataBerputar } from "@/components/kata-berputar";
 import { LinkButton } from "@/components/link-button";
 import { StageIcon } from "@/components/stage-icon";
 import { WizardDialog } from "@/components/wizard-dialog";
-import { downloads, site, stages, totalStages } from "@/lib/data";
+import { downloads, stages, totalStages } from "@/lib/data";
+import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
-/*
- * Judulnya sengaja tidak selesai sendiri.
- *
- * Dulu berbunyi "Berhenti menebak-nebak alur kelulusanmu." — benar, tapi
- * kalimat yang sama bisa dipakai website panduan apa pun. Sekarang bagian
- * akhirnya diisi frasa yang berputar: syarat sempro, berkas komprehensif,
- * jadwal munaqosyah, dan seterusnya. Pengunjung tahu cakupan website ini
- * dalam tiga detik, dari kosakata yang memang mereka pakai.
- */
 const JUDUL = "Berhenti menebak-nebak";
 
-/**
- * Ikon tahap yang mengambang di sisi kanan hero.
- *
- * Tiga yang pertama tampil di layar kecil sekalipun; sisanya menyusul begitu
- * ada ruang. Versi sebelumnya menyembunyikan semuanya di bawah layar lebar,
- * jadi sebagian besar pengunjung tidak pernah melihat gerakan apa pun.
- */
 const ikonMengambang = [
   { i: 0, top: "10%", right: "5%", dur: "5.4s", delay: "0s", kecil: true },
   { i: 4, top: "56%", right: "8%", dur: "4.6s", delay: "0.8s", kecil: true },
@@ -42,12 +30,19 @@ export function Hero() {
 
   return (
     <section className="px-4 pt-4">
-      <div className="aurora grain surface-brand relative mx-auto max-w-5xl overflow-hidden rounded-[1.75rem] px-6 py-12 sm:px-10 sm:py-16">
-        {/* Gumpalan aurora ketiga; dua lainnya digambar sebagai pseudo-element. */}
+      <div className="aurora grain surface-brand relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] border border-white/30 px-6 py-12 shadow-2xl shadow-brand/10 sm:px-10 sm:py-16">
+        {/* Living interactive particle canvas */}
+        <InteractiveParticleCanvas
+          particleColor="rgba(156, 15, 80, 0.45)"
+          lineColor="rgba(156, 15, 80, 0.15)"
+          maxParticles={32}
+          className="opacity-70"
+        />
+
+        {/* Gumpalan aurora ketiga */}
         <span className="aurora-3" aria-hidden />
 
-        {/* Ikon tahap yang mengambang. Murni hiasan, jadi disembunyikan dari
-            pembaca layar. */}
+        {/* Ikon tahap yang mengambang dengan glassmorphism & micro-spring */}
         <div className="pointer-events-none absolute inset-0" aria-hidden>
           {ikonMengambang.map((f) => {
             const stage = stages[f.i];
@@ -56,8 +51,8 @@ export function Hero() {
               <span
                 key={stage.slug}
                 className={cn(
-                  "float-soft absolute flex items-center justify-center rounded-2xl bg-white/50 text-surface-accent shadow-sm ring-1 ring-white/60 backdrop-blur-sm",
-                  "size-9 sm:size-11",
+                  "float-soft absolute flex items-center justify-center rounded-2xl bg-white/60 text-surface-accent shadow-md shadow-brand/10 ring-1 ring-white/80 backdrop-blur-md transition-transform duration-300",
+                  "size-10 sm:size-12",
                   !f.kecil && "hidden md:flex",
                 )}
                 style={
@@ -69,27 +64,23 @@ export function Hero() {
                   } as React.CSSProperties
                 }
               >
-                <StageIcon name={stage.icon} className="size-4 sm:size-5" />
+                <StageIcon name={stage.icon} className="size-4.5 sm:size-5.5" />
               </span>
             );
           })}
         </div>
 
-        <p className="relative z-1 inline-flex items-center gap-2 rounded-full bg-white/60 px-3 py-1 text-xs font-medium ring-1 ring-black/5">
+        <div className="relative z-1 inline-flex items-center gap-2 rounded-full bg-white/70 px-3.5 py-1 text-xs font-semibold text-surface-accent shadow-xs ring-1 ring-black/5 backdrop-blur-md">
           <span
-            className="pulse-ring relative size-1.5 rounded-full bg-surface-accent"
+            className="pulse-ring relative size-2 rounded-full bg-surface-accent"
             aria-hidden
           />
           {site.program} · {site.faculty}
-        </p>
+        </div>
 
-        {/* Judul muncul kata demi kata. Teks utuhnya tetap satu <h1>, jadi
-            pembaca layar dan mesin pencari membacanya sebagai satu kalimat. */}
-        <h1 className="relative z-1 mt-5 font-heading text-[clamp(2.1rem,6.4vw,4.75rem)] leading-[1.02] font-bold tracking-tight text-pretty">
+        {/* Judul kinetik */}
+        <h1 className="relative z-1 mt-5 font-heading text-[clamp(2.2rem,6.8vw,4.85rem)] leading-[1.01] font-extrabold tracking-[-0.035em] text-pretty">
           {kata.map((k, i) => (
-            // Spasinya sengaja di LUAR span. Span-nya `inline-block`, dan
-            // spasi di dalam kotak inline-block dipangkas saat tata letak —
-            // itu yang membuat judulnya sempat terbaca "Berhentimenebak".
             <React.Fragment key={`${k}-${i}`}>
               <span
                 className="word-rise"
@@ -107,8 +98,7 @@ export function Hero() {
           </span>
         </h1>
 
-        {/* Garis perjalanan yang menggambar dirinya sendiri: satu tarikan dari
-            proposal sampai ijazah. */}
+        {/* Garis perjalanan yang menggambar dirinya sendiri */}
         <svg
           viewBox="0 0 640 40"
           className="relative z-1 mt-6 h-8 w-full max-w-lg"
@@ -118,45 +108,33 @@ export function Hero() {
           <path
             d="M4 30 C 120 30, 130 8, 240 8 S 400 32, 512 20 S 610 8, 636 10"
             stroke="var(--surface-accent)"
-            strokeWidth="2.5"
+            strokeWidth="3"
             strokeLinecap="round"
             className="draw-line"
             style={{ "--len": 760 } as React.CSSProperties}
-            opacity="0.55"
+            opacity="0.65"
           />
           <circle cx="636" cy="10" r="5" fill="var(--surface-accent)" />
         </svg>
 
-        <p className="relative z-1 mt-4 max-w-2xl text-base text-pop-foreground/80 text-pretty sm:text-lg">
+        <p className="relative z-1 mt-4 max-w-2xl text-base font-medium text-pop-foreground/85 text-pretty sm:text-lg">
           Dari persiapan proposal sampai ijazah di tangan — satu alur runtut,
           lengkap dengan tenggat resmi yang paling sering bikin mahasiswa
           mengulang.
         </p>
 
-        {/* Ajakan utama. Tombolnya sempat berdiri sendiri tanpa penjelasan
-            apa pun, jadi tidak jelas apa yang didapat setelah diklik — kini
-            disertai janji yang konkret dan cincin berdenyut yang menariknya
-            keluar dari latar. */}
-        <div className="relative z-1 mt-7 flex flex-col gap-2.5 sm:flex-row sm:items-center">
-          {/* w-full di layar sempit: induknya menumpuk tegak dan meregangkan
-              anaknya, jadi span ini melebar penuh sementara tombol di dalamnya
-              hanya selebar teksnya — cincin denyutnya terlihat menjulur ke
-              kanan melewati tombolnya. */}
+        {/* Ajakan utama dengan haptic spring feel */}
+        <div className="relative z-1 mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
           <span className="pulse-ring relative inline-flex w-full rounded-xl sm:w-auto">
             <WizardDialog
               label="Cek, aku di tahap mana?"
-              className="w-full bg-surface-accent text-white shadow-lg shadow-brand/30 transition-transform hover:scale-[1.03] hover:bg-surface-accent/85 sm:w-auto"
+              className="w-full bg-surface-accent text-white shadow-xl shadow-brand/35 transition-all duration-200 hover:scale-[1.03] hover:bg-surface-accent/90 active:scale-[0.98] sm:w-auto"
             />
           </span>
           <LinkButton
             href="/roadmap"
             size="lg"
-            /* Varian outline membawa dark:bg-input/30 dan dark:border-input.
-               Di mode gelap keduanya menimpa warna di sini, dan --input gelap
-               adalah pink tembus pandang — di atas bidang hero yang juga pink,
-               tombolnya nyaris lenyap. Bidang ini sengaja tampil sama di kedua
-               mode, jadi tombolnya pun harus begitu. */
-            className="border-black/15 bg-white/70 text-pop-foreground transition-transform hover:scale-[1.02] hover:bg-white/90 dark:border-black/15 dark:bg-white/70 dark:hover:bg-white/90"
+            className="border-black/15 bg-white/80 text-pop-foreground backdrop-blur-md transition-all duration-200 hover:scale-[1.02] hover:bg-white active:scale-[0.98] dark:border-black/15 dark:bg-white/80 dark:hover:bg-white"
             variant="outline"
           >
             Lihat roadmap
@@ -164,32 +142,33 @@ export function Hero() {
           </LinkButton>
         </div>
 
-        <p className="relative z-1 mt-3 flex items-center gap-1.5 text-sm font-medium text-pop-foreground/75">
-          <MousePointerClick className="size-4 shrink-0" aria-hidden />
+        <p className="relative z-1 mt-3.5 flex items-center gap-1.5 text-sm font-medium text-pop-foreground/80">
+          <MousePointerClick className="size-4 shrink-0 text-surface-accent" aria-hidden />
           Klik di situ: sepuluh pertanyaan singkat, langsung ketahuan tahapmu
           sekarang dan apa lanjutannya.
         </p>
 
-        <dl className="relative z-1 mt-8 flex flex-wrap gap-x-8 gap-y-4">
+        {/* Dynamic Metric Badges */}
+        <dl className="relative z-1 mt-8 flex flex-wrap gap-x-8 gap-y-4 border-t border-black/10 pt-6">
           {[
-            { label: "Tahapan", value: totalStages },
-            { label: "Template", value: downloads.length },
-            { label: "Siap unduh", value: siapUnduh },
+            { label: "Tahapan Lengkap", value: totalStages },
+            { label: "Template Dokumen", value: downloads.length },
+            { label: "Siap Unduh Langsung", value: siapUnduh },
           ].map((stat) => (
-            <div key={stat.label}>
-              <dd className="font-heading text-3xl leading-none font-bold">
+            <div key={stat.label} className="transition-transform duration-200 hover:translate-y-[-2px]">
+              <dd className="font-heading text-3xl leading-none font-extrabold tracking-tight">
                 <CountUp value={stat.value} />
               </dd>
-              <dt className="mt-1 text-xs text-pop-foreground/85">
+              <dt className="mt-1 text-xs font-semibold text-pop-foreground/80">
                 {stat.label}
               </dt>
             </div>
           ))}
-          <div>
-            <dd className="font-heading text-3xl leading-none font-bold">
-              Gratis
+          <div className="transition-transform duration-200 hover:translate-y-[-2px]">
+            <dd className="font-heading text-3xl leading-none font-extrabold tracking-tight">
+              100% Gratis
             </dd>
-            <dt className="mt-1 text-xs text-pop-foreground/85">Tanpa akun</dt>
+            <dt className="mt-1 text-xs font-semibold text-pop-foreground/80">Tanpa akun / registrasi</dt>
           </div>
         </dl>
       </div>
